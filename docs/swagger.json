@@ -1,0 +1,15 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {
+            "name": "API Article",
+            "url": "https://t.me/xakimjonov_0008",
+            "email": "xakimjonov0008@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "paths": {}
+}

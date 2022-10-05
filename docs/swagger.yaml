@@ -1,0 +1,10 @@
+info:
+  contact:
+    email: xakimjonov0008@gmail.com
+    name: API Article
+    url: https://t.me/xakimjonov_0008
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths: {}
+swagger: "2.0"
