@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
 var InMemoryArticleData []Article
 
 func remove(slice []Article, s int) []Article {
@@ -30,10 +31,19 @@ func CreateArticle(c *gin.Context) {
 	})
 }
 
+// GetArticleList godoc
+// @Summary      List articles
+// @Description  get articles
+// @Tags         articles
+// @Accept       json
+// @Produce      json
+// @Success      200  {array} JSONResponse{data=[]Article}
+// @Router       /v1/article [get]
 var GetArticleList = func(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Article | GetList",
-		"data":    InMemoryArticleData,
+	c.JSON(http.StatusOK, 
+		JSONResponse{
+		Message: "Article | GetList",
+		Data:    InMemoryArticleData,
 	})
 }
 
