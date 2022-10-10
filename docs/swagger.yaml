@@ -1,10 +1,214 @@
+definitions:
+  modules.Article:
+    properties:
+      Author_id:
+        type: string
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - Author_id
+    - body
+    - title
+    type: object
+  modules.JSONErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  modules.JSONResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  modules.MakeArticle:
+    properties:
+      Author_idf:
+        type: string
+      body:
+        type: string
+      title:
+        type: string
+    required:
+    - Author_idf
+    - body
+    - title
+    type: object
+  modules.UpadateArticle:
+    properties:
+      body:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    required:
+    - body
+    - id
+    - title
+    type: object
 info:
   contact:
     email: xakimjonov0008@gmail.com
-    name: API Article
+    name: API Article Test
     url: https://t.me/xakimjonov_0008
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-paths: {}
+paths:
+  /v1/article:
+    get:
+      consumes:
+      - application/json
+      description: Get article list
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/modules.Article'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: Get Article List
+      tags:
+      - articles
+    post:
+      consumes:
+      - application/json
+      description: Create a new article
+      parameters:
+      - description: article
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/modules.MakeArticle'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.Article'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: Create article
+      tags:
+      - articles
+    put:
+      consumes:
+      - application/json
+      description: Change current article
+      parameters:
+      - description: article body
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/modules.UpadateArticle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.Article'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: Update an article
+      tags:
+      - articles
+  /v1/article/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: remove an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.Article'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: Delete Article
+      tags:
+      - articles
+    get:
+      consumes:
+      - application/json
+      description: Get an article by Id
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/modules.Article'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: GetArticleById
+      tags:
+      - articles
 swagger: "2.0"
