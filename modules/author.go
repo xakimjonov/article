@@ -15,3 +15,4 @@ type MakeAuthor struct {
 	Lastname  string     `json:"lastname"   binding:"required" minLength:"2" maxLength:"30" example:"Haldson"`
 	
 }
+

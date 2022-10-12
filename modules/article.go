@@ -18,3 +18,11 @@ type Article struct {
 	UpdatedAt *time.Time `json:"updated_at" `
 }
 
+type ArticleFullInfo struct {
+	Id     string `json:"id" `
+	Author  Author `json:"Author" binding:"required" `
+	Content
+	CreatedAt time.Time  `json:"created_at" `
+	UpdatedAt *time.Time `json:"updated_at" `
+}
+

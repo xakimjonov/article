@@ -22,13 +22,23 @@ func CreateArticle(id string, entity modules.MakeArticle) error {
 
 }
 
-func GetArticleById(id string) (modules.Article, error) {
+func GetArticleById(id string) (modules.ArticleFullInfo, error) {
+	var result modules.ArticleFullInfo
 	for _, v := range InMemoryArticleData {
 		if v.Id == id {
-			return v, nil
+			author, err := GetAuthorById(v.AuthorId)
+			if err != nil {
+				return result, err
+			}
+			result.Id = v.Id 
+			result.Content = v.Content
+			result.Author = author
+			result.CreatedAt = v.CreatedAt
+			result.UpdatedAt = v.UpdatedAt
+			return result, nil
 		}
 	}
-	return modules.Article{}, errors.New("article not found")
+	return modules.ArticleFullInfo{}, errors.New("article not found")
 }
 
 func GetArticleList() (resp []modules.Article, err error) {
@@ -50,15 +60,15 @@ func remove(slice []modules.Article, s int) []modules.Article {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func UpadateArticle(article modules.UpadateArticle) error{
+func UpadateArticle(article modules.UpadateArticle) error {
 	for i, v := range InMemoryArticleData {
-		if v.Id == article.Id  {
-            v.Content = article.Content
+		if v.Id == article.Id {
+			v.Content = article.Content
 			t := time.Now()
 			v.UpdatedAt = &t
 			InMemoryArticleData[i] = v
 			return nil
-}
+		}
 	}
 	return errors.New("article not found")
 }

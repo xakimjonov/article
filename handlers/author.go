@@ -10,18 +10,18 @@ import (
 	"github.com/google/uuid"
 )
 
-// CreateArticle godoc
-// @Summary     Create article
-// @Description Create a new article
-// @Tags        articles
+// CreateAuthorgodoc
+// @Summary     Create author
+// @Description Create a new author
+// @Tags        authors
 // @Accept      json
 // @Produce     json
-// @Param       article body     modules.MakeArticle true "article"
-// @Success     201     {object} modules.JSONResponse{data=modules.Article}
-// @Failure     400     {object} modules.JSONErrorResponse
-// @Router      /v1/article [post]
-func CreateArticle(c *gin.Context) {
-	var body modules.MakeArticle
+// @Param       author body     modules.MakeAuthor true "author"
+// @Success     201    {object} modules.JSONResponse{data=modules.Author}
+// @Failure     400    {object} modules.JSONErrorResponse
+// @Router      /v1/author [post]
+func CreateAuthor(c *gin.Context) {
+	var body modules.MakeAuthor
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{Error: err.Error()})
 		return
@@ -29,7 +29,7 @@ func CreateArticle(c *gin.Context) {
 
 	id := uuid.New().String()
 
-	err := storage.CreateArticle(id, body)
+	err := storage.CreateAuthor(id, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -37,58 +37,56 @@ func CreateArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := storage.GetArticleById(id)
+	author, err := storage.GetAuthorById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, modules.JSONResponse{
+	c.JSON(http.StatusCreated, modules.JSONResponse{
 		Message: "Done sucessfully",
-		Data:    article,
+		Data:    author,
 	})
 }
 
-// GetArticleList godoc
-// @Summary     Get Article List
-// @Description Get article list
-// @Tags        articles
+// GetauthorList godoc
+// @Summary     Get AuthorList
+// @Description Get Authorlist
+// @Tags        authors
 // @Accept      json
 // @Produce     json
-// @Success     201 {object} modules.JSONResponse{data=[]modules.Article}
+// @Success     200 {object} modules.JSONResponse{data=[]modules.Author}
 // @Failure     400 {object} modules.JSONErrorResponse
-// @Router      /v1/article [get]
-func GetArticleList(c *gin.Context) {
-	list, err := storage.GetArticleList()
+// @Router      /v1/author  [get]
+func GetAuthorList(c *gin.Context) {
+	list, err := storage.GetAuthorList()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK,
-		modules.JSONResponse{
+	c.JSON(http.StatusOK,modules.JSONResponse{
 			Message: "Done",
 			Data:    list,
-		},
-	)
+		})
 }
 
-// GetArticleById godoc
-// @Summary     GetArticleById
-// @Description Get an article by Id
-// @Tags        articles
+// GetauthorById godoc
+// @Summary     GetauthorById
+// @Description Get an Author by Id
+// @Tags        authors
 // @Accept      json
 // @Produce     json
-// @Param       id  path     string true "Article ID"
+// @Param       id  path     string true "AuthorID"
 // @Success     200 {object} modules.JSONResponse{data=modules.ArticleFullInfo}
 // @Failure     400 {object} modules.JSONErrorResponse
-// @Router      /v1/article/{id} [get]
-func GetArticleById(c *gin.Context) {
+// @Router      /v1/author/{id} [get]
+func GetAuthorById(c *gin.Context) {
 	idStr := c.Param("id")
 
-	article, err := storage.GetArticleById(idStr)
+	author, err := storage.GetAuthorById(idStr)
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -97,62 +95,61 @@ func GetArticleById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, modules.JSONResponse{
 		Message: "Done sucessfully",
-		Data:    article,
+		Data:    author,
 	})
 	return
 }
 
-// UpdatedArticle godoc
-// @Summary     Update an article
-// @Description Change current article
-// @Tags        articles
+// UpdateAuthor godoc
+// @Summary     Update an author
+// @Description Change current author
+// @Tags        authors
 // @Accept      json
 // @Produce     json
-// @Param       article body     modules.UpadateArticle true "article body"
-// @Success     200     {object} modules.JSONResponse{data=modules.Article}
+// @Param       article body     modules.UpadateAuthor true "author body"
+// @Success     200     {object} modules.JSONResponse{data=modules.Author}
 // @Failure     400     {object} modules.JSONErrorResponse
-// @Router      /v1/article [put]
-func UpdatedArticle(c *gin.Context) {
-	var body modules.UpadateArticle
+// @Router      /v1/author [put]
+
+func UpdateAuthor(c *gin.Context) {
+	var body modules.UpdateAuthor
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := storage.UpadateArticle(body)
+	err := storage.UpdateAuthor(body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
 		})
 		return
 	}
-
-	article, err := storage.GetArticleById(body.Id)
+	author, err := storage.GetAuthorById(body.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
 		})
 		return
 	}
-
 	c.JSON(http.StatusOK, modules.JSONResponse{
 		Message: "Updated sucessfully",
-		Data:    article,
+		Data:    author,
 	})
 }
 
-// DeleteArticle godoc
-// @Summary     Delete Article
-// @Description remove an article
-// @Tags        articles
+// DeleteAuthor godoc
+// @Summary     Delete author
+// @Description remove an author
+// @Tags        authors
 // @Accept      json
 // @Produce     json
-// @Param       id  path     string true "Article ID"
-// @Success     200 {object} modules.JSONResponse{data=modules.Article}
+// @Param       id  path     string true "AuthorID"
+// @Success     200 {object} modules.JSONResponse{data=modules.Author}
 // @Failure     400 {object} modules.JSONErrorResponse
-// @Router      /v1/article/{id} [delete]
-func DeleteArticle(c *gin.Context) {
+// @Router      /v1/author/{id} [delete]
+func DeleteAuthor(c *gin.Context) {
 	idStr := c.Param("id")
-	article, err := storage.DeleteArticle(idStr)
+	author, err := storage.DeleteAuthor(idStr)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{
@@ -162,7 +159,7 @@ func DeleteArticle(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, modules.JSONResponse{
 		Message: "Deleted sucessfully",
-		Data:    article,
+		Data:    author,
 	})
 	return
 }

@@ -23,13 +23,19 @@ func main() {
 	storage.InMemoryArticleData = make([]modules.Article, 0)
 	router := gin.Default()
 
-	v1 := router.Group("/v1/article")
+	v1 := router.Group("/v1")
 	{
-		v1.POST("/", handlers.CreateArticle)
-		v1.GET("/", handlers.GetArticleList)
-		v1.GET("/:id", handlers.GetArticleById)
-		v1.PUT("/", handlers.UpdatedArticle)
-		v1.DELETE("/:id", handlers.DeleteArticle)
+		v1.POST("/article", handlers.CreateArticle)
+		v1.GET("/article", handlers.GetArticleList)
+		v1.GET("/article/:id", handlers.GetArticleById)
+		v1.PUT("/article", handlers.UpdatedArticle)
+		v1.DELETE("/article/:id", handlers.DeleteArticle)
+
+		v1.POST("/author", handlers.CreateAuthor)
+		v1.GET("/author", handlers.GetAuthorList)
+		v1.GET("/author/:id", handlers.GetAuthorById)
+		v1.PUT("/author", handlers.UpdateAuthor)
+		v1.DELETE("/author/:id", handlers.DeleteAuthor)
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run(":5454") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")

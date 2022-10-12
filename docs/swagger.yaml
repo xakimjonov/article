@@ -18,6 +18,47 @@ definitions:
     - body
     - title
     type: object
+  modules.ArticleFullInfo:
+    properties:
+      Author:
+        $ref: '#/definitions/modules.Author'
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - Author
+    - body
+    - title
+    type: object
+  modules.Author:
+    properties:
+      created_at:
+        type: string
+      firstname:
+        example: Jack
+        maxLength: 30
+        minLength: 2
+        type: string
+      id:
+        type: string
+      lastname:
+        example: Haldson
+        maxLength: 30
+        minLength: 2
+        type: string
+      updated_at:
+        type: string
+    required:
+    - firstname
+    - lastname
+    type: object
   modules.JSONErrorResponse:
     properties:
       error:
@@ -31,16 +72,32 @@ definitions:
     type: object
   modules.MakeArticle:
     properties:
-      Author_idf:
+      author_id:
         type: string
       body:
         type: string
       title:
         type: string
     required:
-    - Author_idf
+    - author_id
     - body
     - title
+    type: object
+  modules.MakeAuthor:
+    properties:
+      firstname:
+        example: Jack
+        maxLength: 30
+        minLength: 2
+        type: string
+      lastname:
+        example: Haldson
+        maxLength: 30
+        minLength: 2
+        type: string
+    required:
+    - firstname
+    - lastname
     type: object
   modules.UpadateArticle:
     properties:
@@ -200,9 +257,7 @@ paths:
             - $ref: '#/definitions/modules.JSONResponse'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/modules.Article'
-                  type: array
+                  $ref: '#/definitions/modules.ArticleFullInfo'
               type: object
         "400":
           description: Bad Request
@@ -211,4 +266,119 @@ paths:
       summary: GetArticleById
       tags:
       - articles
+  /v1/author:
+    get:
+      consumes:
+      - application/json
+      description: Get Authorlist
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/modules.Author'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: Get AuthorList
+      tags:
+      - authors
+    post:
+      consumes:
+      - application/json
+      description: Create a new author
+      parameters:
+      - description: author
+        in: body
+        name: author
+        required: true
+        schema:
+          $ref: '#/definitions/modules.MakeAuthor'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.Author'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: Create author
+      tags:
+      - authors
+  /v1/author/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: remove an author
+      parameters:
+      - description: AuthorID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.Author'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: Delete author
+      tags:
+      - authors
+    get:
+      consumes:
+      - application/json
+      description: Get an Author by Id
+      parameters:
+      - description: AuthorID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/modules.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.ArticleFullInfo'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/modules.JSONErrorResponse'
+      summary: GetauthorById
+      tags:
+      - authors
 swagger: "2.0"
