@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/xakimjonov/article/modules"
-	"github.com/xakimjonov/article/storage"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -20,7 +20,7 @@ import (
 // @Success     201    {object} modules.JSONResponse{data=modules.Author}
 // @Failure     400    {object} modules.JSONErrorResponse
 // @Router      /v1/author [post]
-func CreateAuthor(c *gin.Context) {
+func (h *Handler) CreateAuthor(c *gin.Context) {
 	var body modules.MakeAuthor
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{Error: err.Error()})
@@ -29,7 +29,7 @@ func CreateAuthor(c *gin.Context) {
 
 	id := uuid.New().String()
 
-	err := storage.CreateAuthor(id, body)
+	err := h.IM.CreateAuthor(id, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -37,7 +37,7 @@ func CreateAuthor(c *gin.Context) {
 		return
 	}
 
-	author, err := storage.GetAuthorById(id)
+	author, err := h.IM.GetAuthorById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -56,21 +56,45 @@ func CreateAuthor(c *gin.Context) {
 // @Tags        authors
 // @Accept      json
 // @Produce     json
+// @Param       offset query    int false "0"
+// @Param       limit  query    int false "5"
+// @Param       search query    string false "JUST"
 // @Success     200 {object} modules.JSONResponse{data=[]modules.Author}
 // @Failure     400 {object} modules.JSONErrorResponse
 // @Router      /v1/author  [get]
-func GetAuthorList(c *gin.Context) {
-	list, err := storage.GetAuthorList()
+func (h *Handler) GetAuthorList(c *gin.Context) {
+	offsetStr := c.DefaultQuery("offset", "0")
+	limitStr := c.DefaultQuery("limit", "10")
+	searchStr := c.DefaultQuery("search", "")
+
+	offset, err := strconv.Atoi(offsetStr)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	list, err := h.IM.GetAuthorList(offset, limit, searchStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK,modules.JSONResponse{
-			Message: "Done",
-			Data:    list,
-		})
+	c.JSON(http.StatusOK, modules.JSONResponse{
+		Message: "Done",
+		Data:    list,
+	})
 }
 
 // GetauthorById godoc
@@ -83,10 +107,10 @@ func GetAuthorList(c *gin.Context) {
 // @Success     200 {object} modules.JSONResponse{data=modules.ArticleFullInfo}
 // @Failure     400 {object} modules.JSONErrorResponse
 // @Router      /v1/author/{id} [get]
-func GetAuthorById(c *gin.Context) {
+func (h *Handler) GetAuthorById(c *gin.Context) {
 	idStr := c.Param("id")
 
-	author, err := storage.GetAuthorById(idStr)
+	author, err := h.IM.GetAuthorById(idStr)
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -102,29 +126,28 @@ func GetAuthorById(c *gin.Context) {
 
 // UpdateAuthor godoc
 // @Summary     Update an author
-// @Description Change current author
+// @Description Update an author
 // @Tags        authors
 // @Accept      json
 // @Produce     json
-// @Param       article body     modules.UpadateAuthor true "author body"
+// @Param       article body     modules.UpdateAuthor true "author body"
 // @Success     200     {object} modules.JSONResponse{data=modules.Author}
 // @Failure     400     {object} modules.JSONErrorResponse
 // @Router      /v1/author [put]
-
-func UpdateAuthor(c *gin.Context) {
+func (h *Handler) UpdateAuthor(c *gin.Context) {
 	var body modules.UpdateAuthor
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := storage.UpdateAuthor(body)
+	err := h.IM.UpdateAuthor(body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
 		})
 		return
 	}
-	author, err := storage.GetAuthorById(body.Id)
+	author, err := h.IM.GetAuthorById(body.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -147,9 +170,10 @@ func UpdateAuthor(c *gin.Context) {
 // @Success     200 {object} modules.JSONResponse{data=modules.Author}
 // @Failure     400 {object} modules.JSONErrorResponse
 // @Router      /v1/author/{id} [delete]
-func DeleteAuthor(c *gin.Context) {
+func (h *Handler) DeleteAuthor(c *gin.Context) {
+
 	idStr := c.Param("id")
-	author, err := storage.DeleteAuthor(idStr)
+	author, err := h.IM.DeleteAuthor(idStr)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{

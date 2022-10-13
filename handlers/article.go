@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/xakimjonov/article/modules"
-	"github.com/xakimjonov/article/storage"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -20,7 +20,7 @@ import (
 // @Success     201     {object} modules.JSONResponse{data=modules.Article}
 // @Failure     400     {object} modules.JSONErrorResponse
 // @Router      /v1/article [post]
-func CreateArticle(c *gin.Context) {
+func (h *Handler) CreateArticle(c *gin.Context) {
 	var body modules.MakeArticle
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{Error: err.Error()})
@@ -29,7 +29,7 @@ func CreateArticle(c *gin.Context) {
 
 	id := uuid.New().String()
 
-	err := storage.CreateArticle(id, body)
+	err := h.IM.CreateArticle(id, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -37,7 +37,7 @@ func CreateArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := storage.GetArticleById(id)
+	article, err := h.IM.GetArticleById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -56,11 +56,36 @@ func CreateArticle(c *gin.Context) {
 // @Tags        articles
 // @Accept      json
 // @Produce     json
+// @Param       offset query    int false "0"
+// @Param       limit  query    int false "5"
+// @Param       search query    string false "JUST"
 // @Success     201 {object} modules.JSONResponse{data=[]modules.Article}
 // @Failure     400 {object} modules.JSONErrorResponse
 // @Router      /v1/article [get]
-func GetArticleList(c *gin.Context) {
-	list, err := storage.GetArticleList()
+func (h *Handler) GetArticleList(c *gin.Context) {
+
+	offsetStr := c.DefaultQuery("offset", "0")
+	limitStr := c.DefaultQuery("limit", "10")
+	searchStr := c.DefaultQuery("search", "")
+
+	offset, err := strconv.Atoi(offsetStr)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	list, err := h.IM.GetArticleList(offset, limit, searchStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -85,10 +110,10 @@ func GetArticleList(c *gin.Context) {
 // @Success     200 {object} modules.JSONResponse{data=modules.ArticleFullInfo}
 // @Failure     400 {object} modules.JSONErrorResponse
 // @Router      /v1/article/{id} [get]
-func GetArticleById(c *gin.Context) {
+func (h *Handler) GetArticleById(c *gin.Context) {
 	idStr := c.Param("id")
 
-	article, err := storage.GetArticleById(idStr)
+	article, err := h.IM.GetArticleById(idStr)
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -112,13 +137,14 @@ func GetArticleById(c *gin.Context) {
 // @Success     200     {object} modules.JSONResponse{data=modules.Article}
 // @Failure     400     {object} modules.JSONErrorResponse
 // @Router      /v1/article [put]
-func UpdatedArticle(c *gin.Context) {
+func (h *Handler) UpdatedArticle(c *gin.Context) {
+
 	var body modules.UpadateArticle
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := storage.UpadateArticle(body)
+	err := h.IM.UpadateArticle(body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -126,7 +152,7 @@ func UpdatedArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := storage.GetArticleById(body.Id)
+	article, err := h.IM.GetArticleById(body.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -150,9 +176,10 @@ func UpdatedArticle(c *gin.Context) {
 // @Success     200 {object} modules.JSONResponse{data=modules.Article}
 // @Failure     400 {object} modules.JSONErrorResponse
 // @Router      /v1/article/{id} [delete]
-func DeleteArticle(c *gin.Context) {
+func (h *Handler) DeleteArticle(c *gin.Context) {
 	idStr := c.Param("id")
-	article, err := storage.DeleteArticle(idStr)
+
+	article, err := h.IM.DeleteArticle(idStr)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{
