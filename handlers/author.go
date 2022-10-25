@@ -29,7 +29,7 @@ func (h *Handler) CreateAuthor(c *gin.Context) {
 
 	id := uuid.New().String()
 
-	err := h.IM.CreateAuthor(id, body)
+	err := h.Stg.CreateAuthor(id, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -37,7 +37,7 @@ func (h *Handler) CreateAuthor(c *gin.Context) {
 		return
 	}
 
-	author, err := h.IM.GetAuthorById(id)
+	author, err := h.Stg.GetAuthorById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -84,7 +84,7 @@ func (h *Handler) GetAuthorList(c *gin.Context) {
 		return
 	}
 
-	list, err := h.IM.GetAuthorList(offset, limit, searchStr)
+	list, err := h.Stg.GetAuthorList(offset, limit, searchStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -110,7 +110,7 @@ func (h *Handler) GetAuthorList(c *gin.Context) {
 func (h *Handler) GetAuthorById(c *gin.Context) {
 	idStr := c.Param("id")
 
-	author, err := h.IM.GetAuthorById(idStr)
+	author, err := h.Stg.GetAuthorById(idStr)
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -140,14 +140,14 @@ func (h *Handler) UpdateAuthor(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := h.IM.UpdateAuthor(body)
+	err := h.Stg.UpdateAuthor(body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
 		})
 		return
 	}
-	author, err := h.IM.GetAuthorById(body.Id)
+	author, err := h.Stg.GetAuthorById(body.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -173,7 +173,7 @@ func (h *Handler) UpdateAuthor(c *gin.Context) {
 func (h *Handler) DeleteAuthor(c *gin.Context) {
 
 	idStr := c.Param("id")
-	author, err := h.IM.DeleteAuthor(idStr)
+	author, err := h.Stg.DeleteAuthor(idStr)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{

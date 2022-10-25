@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/xakimjonov/article/handlers"
+	"github.com/xakimjonov/article/storage"
 	"github.com/xakimjonov/article/storage/inmemeory"
 
 	"github.com/gin-gonic/gin"
@@ -21,11 +22,14 @@ func main() {
 
 	router := gin.Default()
 
-	im:= inmemeory.InMemeory{
+
+	var stg storage.StoInter
+	stg = inmemeory.InMemeory{
 		Db: &inmemeory.DB{},
 	}
+
 	h := handlers.Handler{
-	IM: im,
+	Stg: stg,
 	}
 
 	v1 := router.Group("/v1")

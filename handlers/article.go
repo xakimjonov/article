@@ -29,7 +29,7 @@ func (h *Handler) CreateArticle(c *gin.Context) {
 
 	id := uuid.New().String()
 
-	err := h.IM.CreateArticle(id, body)
+	err := h.Stg.CreateArticle(id, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -37,7 +37,7 @@ func (h *Handler) CreateArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := h.IM.GetArticleById(id)
+	article, err := h.Stg.GetArticleById(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -85,7 +85,7 @@ func (h *Handler) GetArticleList(c *gin.Context) {
 		return
 	}
 
-	list, err := h.IM.GetArticleList(offset, limit, searchStr)
+	list, err := h.Stg.GetArticleList(offset, limit, searchStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -113,7 +113,7 @@ func (h *Handler) GetArticleList(c *gin.Context) {
 func (h *Handler) GetArticleById(c *gin.Context) {
 	idStr := c.Param("id")
 
-	article, err := h.IM.GetArticleById(idStr)
+	article, err := h.Stg.GetArticleById(idStr)
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -144,7 +144,7 @@ func (h *Handler) UpdatedArticle(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := h.IM.UpadateArticle(body)
+	err := h.Stg.UpadateArticle(body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -152,7 +152,7 @@ func (h *Handler) UpdatedArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := h.IM.GetArticleById(body.Id)
+	article, err := h.Stg.GetArticleById(body.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, modules.JSONErrorResponse{
 			Error: err.Error(),
@@ -179,7 +179,7 @@ func (h *Handler) UpdatedArticle(c *gin.Context) {
 func (h *Handler) DeleteArticle(c *gin.Context) {
 	idStr := c.Param("id")
 
-	article, err := h.IM.DeleteArticle(idStr)
+	article, err := h.Stg.DeleteArticle(idStr)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, modules.JSONErrorResponse{

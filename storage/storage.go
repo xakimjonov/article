@@ -6,7 +6,7 @@ type StoInter interface {
 	CreateArticle(id string, entity modules.MakeArticle) error
 	GetArticleById(id string) (modules.ArticleFullInfo, error)
 	DeleteArticle(id string) (modules.Article, error)
-    UpadateArticle(article modules.UpadateArticle)
+    UpadateArticle(article modules.UpadateArticle) error
 	GetArticleList(offset, limit int, search string) (resp []modules.Article, err error)
     
 
